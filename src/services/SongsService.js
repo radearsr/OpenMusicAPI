@@ -38,7 +38,12 @@ class SongsService {
   async getSongs(title, performer) {
     let query = "SELECT id, title, performer FROM songs";
 
-    if ((title != undefined && title != "") || (performer != undefined && performer != "")) {
+    
+    if ((title != undefined && title != "") && (performer != undefined && performer != "")) {
+      query = `SELECT id, title, performer FROM songs
+      WHERE LOWER(title) LIKE '%${title}%'
+      AND LOWER(performer) LIKE '%${performer}%'`;
+    }else if ((title != undefined && title != "") || (performer != undefined && performer != "")) {
       query = `SELECT id, title, performer FROM songs
       WHERE LOWER(title) LIKE '%${title}%'
       OR LOWER(performer) LIKE '%${performer}%'`;

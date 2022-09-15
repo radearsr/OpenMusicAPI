@@ -2,6 +2,7 @@ require("dotenv").config();
 const Hapi = require("@hapi/hapi");
 const albums = require("./api/Albums");
 const AlbumsService = require("./services/AlbumService");
+const AlbumsValidator = require("./validator/Albums");
 
 const init = async () => {
 
@@ -21,10 +22,11 @@ const init = async () => {
     plugin: albums,
     options: {
       service: albumsService,
+      validator: AlbumsValidator,
     },
   });
 
-  await server.start();
+  await server.start(); 
   console.log(`Server berjalan pada ${server.info.uri}`);
 };
 

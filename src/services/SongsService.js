@@ -28,7 +28,7 @@ class SongsService {
 
     const [resultRow] = result.rows;
 
-    if (!result.rows.length) {
+    if (!resultRow.id) {
       throw new InvariantError("Gagal menambahkan musik");
     }
 
@@ -48,8 +48,8 @@ class SongsService {
       WHERE LOWER(title) LIKE '%${title}%'
       OR LOWER(performer) LIKE '%${performer}%'`;
     }
-    const result = await this._pool.query(query);
-    return result.rows;
+    const { rows } = await this._pool.query(query);
+    return rows;
   }
 
   async getSongById(id) {

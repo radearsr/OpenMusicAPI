@@ -3,9 +3,9 @@ const { nanoid } = require("nanoid");
 const InvariantError = require("../exceptions/InvariantError");
 const NotFoundError = require("../exceptions/NotFoundError");
 const AuthorizationError = require("../exceptions/AuthorizationError");
+const { mapDBToResponse } = require("../utils");
 
 class PlaylistsService{
-
   constructor() {
     this._pool = new Pool;
   }
@@ -37,10 +37,12 @@ class PlaylistsService{
 
     const result = await this._pool.query(query);
 
+    const playlists = result.rows.map(mapDBToResponse);
+
     if (!result.rows.length) {
       throw new NotFoundError("Playlist tidak ditemukan")
     }
-    return result.rows;
+    return playlists;
   }
 
   async deletePlaylistById(id) {
@@ -95,13 +97,35 @@ class PlaylistsService{
 
   async getPlaylistSongs(playlistId, owner) {
     const queryPlaylist = {
-      text: "SELECT * FROM playlists WHERE owner = $1 AND id = $2",
-      values: [playlistId, owner]
+      text: "SELECT pl.id, pl.name, usr.username FROM playlists AS pl LEFT JOIN users AS usr ON pl.owner = usr.id WHERE pl.owner = $1 AND pl.id = $2",
+      values: [owner, playlistId],
+    };
+    const resultDetailPlaylist = await this._pool.query(queryPlaylist);
+    const [ detailplaylists ] = resultDetailPlaylist.rows;
+
+    const querySongs = {
+      text: "SELECT so.id, so.title, so.performer FROM songs AS so LEFT JOIN playlist_songs AS pls ON so.id = pls.song_id WHERE pls.playlist_id = $1 order by so.id;",
+      values: [playlistId],
+    };
+
+    const { rows } = await this._pool.query(querySongs);
+
+    const resultPlaylistSongs = Object.assign({}, detailplaylists, {songs: rows});
+
+    return resultPlaylistSongs;
+  }
+
+  async deletePlaylistSongById(playlistId, songId) {
+    const query =  {
+      text:"DELETE FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2 RETURNING id",
+      values: [playlistId, songId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError("Gagal menghapus musik dalam playlist. ID musik tidak ditemukan");
     }
-    console.log("OWNER", owner);
-    const result = await this._pool.query(queryPlaylist);
-    console.log("Result", result);
-    return result;
   }
 }
 

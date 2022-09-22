@@ -16,4 +16,14 @@ const mapDBToModel = ({
   albumId: album_id, 
 });
 
-module.exports = { mapDBToModel };
+const mapDBToResponse  = ({
+  id,
+  name,
+  owner,
+}) => ({
+  id,
+  name,
+  username: owner,
+});
+
+module.exports = { mapDBToModel, mapDBToResponse };

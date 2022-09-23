@@ -3,11 +3,11 @@ const { nanoid } = require("nanoid");
 const InvariantError = require("../exceptions/InvariantError");
 const NotFoundError = require("../exceptions/NotFoundError");
 const AuthorizationError = require("../exceptions/AuthorizationError");
-const { mapDBToResponse } = require("../utils");
 
 class PlaylistsService{
-  constructor() {
+  constructor(collaborationsService) {
     this._pool = new Pool;
+    this._collaborationsService = collaborationsService;
   }
 
   async addPlaylist({name, owner}) {
@@ -31,17 +31,14 @@ class PlaylistsService{
 
   async getPlaylists(owner) {
     const query = {
-      text: "SELECT * FROM playlists WHERE owner = $1",
+      text: "SELECT pl.id, pl.name, usr.username FROM playlists AS pl LEFT JOIN collaborations AS clb ON pl.id = clb.playlist_id LEFT JOIN users AS usr ON usr.id = pl.owner WHERE clb.user_id=$1 OR pl.owner=$1 ORDER BY pl.id",
       values: [owner],
     };
 
     const result = await this._pool.query(query);
 
-    const playlists = result.rows.map(mapDBToResponse);
+    const {rows: playlists} = result;
 
-    if (!result.rows.length) {
-      throw new NotFoundError("Playlist tidak ditemukan")
-    }
     return playlists;
   }
 
@@ -97,14 +94,14 @@ class PlaylistsService{
 
   async getPlaylistSongs(playlistId, owner) {
     const queryPlaylist = {
-      text: "SELECT pl.id, pl.name, usr.username FROM playlists AS pl LEFT JOIN users AS usr ON pl.owner = usr.id WHERE pl.owner = $1 AND pl.id = $2",
-      values: [owner, playlistId],
+      text: "SELECT dtplaylist.id, dtplaylist.name, dtplaylist.username FROM (SELECT pl.id, pl.name, usr.username FROM playlists AS pl LEFT JOIN collaborations AS clb ON pl.id = clb.playlist_id LEFT JOIN users AS usr ON pl.owner = usr.id WHERE (clb.playlist_id = $1 AND clb.user_id = $2) OR (pl.id = $1 AND pl.owner = $2)) AS dtplaylist",
+      values: [playlistId, owner],
     };
     const resultDetailPlaylist = await this._pool.query(queryPlaylist);
     const [ detailplaylists ] = resultDetailPlaylist.rows;
 
     const querySongs = {
-      text: "SELECT so.id, so.title, so.performer FROM songs AS so LEFT JOIN playlist_songs AS pls ON so.id = pls.song_id WHERE pls.playlist_id = $1 order by so.id;",
+      text: "SELECT so.id, so.title, so.performer FROM songs AS so LEFT JOIN playlist_songs AS pls ON so.id = pls.song_id WHERE pls.playlist_id = $1 ORDER BY so.id;",
       values: [playlistId],
     };
 
@@ -125,6 +122,22 @@ class PlaylistsService{
 
     if (!result.rows.length) {
       throw new NotFoundError("Gagal menghapus musik dalam playlist. ID musik tidak ditemukan");
+    }
+  }
+
+  async verifyPlaylistAccess(playlistId, userId) {
+    try {
+      await this.verifyPlaylistOwner(playlistId, userId);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+
+      try {
+        await this._collaborationsService.verifyCollaborator(playlistId, userId);
+      } catch {
+        throw error;
+      }
     }
   }
 }

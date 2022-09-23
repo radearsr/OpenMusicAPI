@@ -4,11 +4,6 @@ class AlbumHandler {
   constructor(service, validator) {
     this._service = service;
     this._validator = validator;
-
-    this.postAlbumHandler = this.postAlbumHandler.bind(this);
-    this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
-    this.putAlbumByIdHandler = this.putAlbumByIdHandler.bind(this);
-    this.deleteByIdHandler = this.deleteByIdHandler.bind(this);
   }
 
   async postAlbumHandler(request, h) {

@@ -140,6 +140,39 @@ class PlaylistsService{
       }
     }
   }
+
+  async recordPlaylistSongsActivities(action, playlistId, songId, userId) {
+    const id = `acivities-${nanoid(16)}`;
+    const timeActivities = new Date().toISOString();
+    new Date().toISOString();
+    const query = {
+      text: "INSERT INTO playlist_songs_activities VALUES($1, $2, $3, $4, $5, $6) RETURNING id",
+      values: [id, playlistId, userId, songId, action, timeActivities],
+    };
+
+    const result = await this._pool.query(query);
+    const [{ id: activitiesId }] = result.rows;
+
+    if (!activitiesId) {
+      throw new InvariantError("Gagal melakukan record aktivitas");
+    }
+  }
+
+  async getPlaylistSongsActivities(playlistId) {
+    const query = {
+      text: "SELECT usr.username, so.title, plsa.action, plsa.time FROM playlist_songs_activities AS plsa LEFT JOIN users AS usr ON plsa.user_id = usr.id LEFT JOIN songs AS so ON plsa.song_id = so.id WHERE plsa.playlist_id = $1",
+      values: [playlistId],
+    };
+
+    const result = await this._pool.query(query);
+    const { rows: activities } = result;
+
+    if (!activities.length) {
+      throw new NotFoundError("Belum ada aktifitas pada playlist musik ini");
+    }
+    
+    return activities;
+  }
 }
 
 module.exports = PlaylistsService;

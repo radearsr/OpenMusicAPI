@@ -1,6 +1,4 @@
-const ClientError = require("../../exceptions/ClientError");
-
-class AuthenticationsHandler{
+class AuthenticationsHandler {
   constructor(authenticationsService, usersService, tokenManager, validator) {
     this._authenticationsService = authenticationsService;
     this._usersService = usersService;
@@ -31,11 +29,11 @@ class AuthenticationsHandler{
     return response;
   }
 
-  async putAuthenticationHandler(request, h) {
+  async putAuthenticationHandler(request) {
     this._validator.validatePutAuthenticationPayload(request.payload);
 
     const { refreshToken } = request.payload;
-    await  this._authenticationsService.verifyRefreshToken(refreshToken);
+    await this._authenticationsService.verifyRefreshToken(refreshToken);
 
     const { id } = this._tokenManager.verifyRefreshToken(refreshToken);
     const accessToken = this._tokenManager.generateAccessToken({ id });
@@ -45,11 +43,11 @@ class AuthenticationsHandler{
       message: "Access token berhasil diperbarui",
       data: {
         accessToken,
-      }
-    }
+      },
+    };
   }
 
-  async deleteAuthenticationHandler(request, h) {
+  async deleteAuthenticationHandler(request) {
     this._validator.validateDeleteAuthenticationPayload(request.payload);
 
     const { refreshToken } = request.payload;
@@ -61,6 +59,6 @@ class AuthenticationsHandler{
       message: "Refresh token berhasil dihapus",
     };
   }
-} 
+}
 
 module.exports = AuthenticationsHandler;

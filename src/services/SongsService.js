@@ -15,13 +15,13 @@ class SongsService {
     genre,
     performer,
     duration,
-    albumId
+    albumId,
   ) {
     const id = `song-${nanoid(16)}`;
-    
+
     const query = {
       text: "INSERT INTO songs VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id",
-      values: [id, title, year, genre, performer, duration, albumId]
+      values: [id, title, year, genre, performer, duration, albumId],
     };
 
     const result = await this._pool.query(query);
@@ -38,12 +38,11 @@ class SongsService {
   async getSongs(title, performer) {
     let query = "SELECT id, title, performer FROM songs";
 
-    
-    if ((title != undefined && title != "") && (performer != undefined && performer != "")) {
+    if ((title !== undefined && title !== "") && (performer !== undefined && performer !== "")) {
       query = `SELECT id, title, performer FROM songs
       WHERE LOWER(title) LIKE '%${title}%'
       AND LOWER(performer) LIKE '%${performer}%'`;
-    }else if ((title != undefined && title != "") || (performer != undefined && performer != "")) {
+    } else if ((title !== undefined && title !== "") || (performer !== undefined && performer !== "")) {
       query = `SELECT id, title, performer FROM songs
       WHERE LOWER(title) LIKE '%${title}%'
       OR LOWER(performer) LIKE '%${performer}%'`;
@@ -61,7 +60,7 @@ class SongsService {
     const result = await this._pool.query(query);
 
     const [resultRow] = result.rows.map(mapDBToModel);
-    
+
     if (!result.rows.length) {
       throw new NotFoundError("Musik tidak ditemukan");
     }
@@ -78,7 +77,7 @@ class SongsService {
   }) {
     const query = {
       text: "UPDATE songs SET title = $1, year = $2, performer = $3, genre = $4, duration = $5, album_id = $6 WHERE id = $7 RETURNING id",
-      values: [title, year, performer, genre, duration, albumId, id]
+      values: [title, year, performer, genre, duration, albumId, id],
     };
 
     const result = await this._pool.query(query);
@@ -100,7 +99,7 @@ class SongsService {
 
     const result = await this._pool.query(query);
 
-    if(!result.rows.length) {
+    if (!result.rows.length) {
       throw new NotFoundError("Gagal menghapus musik. Id tidak ditemukan");
     }
   }

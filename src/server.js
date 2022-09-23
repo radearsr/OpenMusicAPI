@@ -17,7 +17,7 @@ const UsersValidator = require("./validator/users");
 
 const authentications = require("./api/Authentications");
 const AuthenticationsService = require("./services/AuthenticationsService");
-const tokenManager = require("./tokenize/TokenManager");
+const tknManager = require("./tokenize/TokenManager");
 const AuthenticationsValidator = require("./validator/authentications");
 
 const playlists = require("./api/Playlists");
@@ -97,7 +97,7 @@ const init = async () => {
       options: {
         authenticationsService,
         usersService,
-        tokenManager: tokenManager,
+        tokenManager: tknManager,
         validator: AuthenticationsValidator,
       },
     },
@@ -116,14 +116,13 @@ const init = async () => {
         playlistsService,
         usersService,
         validator: CollaborationsValidator,
-      }
-    }
+      },
+    },
   ]);
 
   server.ext("onPreResponse", (request, h) => {
     const { response } = request;
     if (response instanceof Error) {
- 
       if (response instanceof ClientError) {
         const newResponse = h.response({
           status: "fail",
@@ -142,6 +141,7 @@ const init = async () => {
         message: "Maaf, terjadi kegagalan pada server kami",
       });
       newResponse.code(500);
+      console.log(response);
       return newResponse;
     }
 
@@ -149,7 +149,7 @@ const init = async () => {
   });
 
   await server.start();
-  console.log(`Server berjalan pada ${server.info.uri}`);
+  console.info(`Server berjalan pada ${server.info.uri}`);
 };
 
 init();

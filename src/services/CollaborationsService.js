@@ -2,7 +2,7 @@ const { Pool } = require("pg");
 const { nanoid } = require("nanoid");
 const InvariantError = require("../exceptions/InvariantError");
 
-class CollaborationsService{
+class CollaborationsService {
   constructor() {
     this._pool = new Pool;
   }
@@ -17,7 +17,7 @@ class CollaborationsService{
 
     const result = await this._pool.query(query);
 
-    const [{ id: collaborationId }] = result.rows; 
+    const [{ id: collaborationId }] = result.rows;
 
     if (!collaborationId) {
       throw new InvariantError("Gagal menambahkan kolaborasi");

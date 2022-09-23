@@ -11,7 +11,7 @@ exports.up = (pgm) => {
     user_id: {
       type: "VARCHAR(50)",
       notNull: true,
-    }
+    },
   });
 
   pgm.addConstraint("collaborations", "unique_playlist_id_and_user_id", "UNIQUE(playlist_id, user_id)");

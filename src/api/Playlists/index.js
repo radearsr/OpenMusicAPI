@@ -7,5 +7,5 @@ module.exports = {
   register: async (server, { playlistsService, songsService, validator }) => {
     const playlistHandler = new PlaylistsHandler(playlistsService, songsService, validator);
     server.route(routes(playlistHandler));
-  }
+  },
 };

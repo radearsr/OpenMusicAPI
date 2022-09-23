@@ -1,6 +1,4 @@
-const ClientError = require("../../exceptions/ClientError");
-
-class PlaylistsHandler{
+class PlaylistsHandler {
   constructor(playlistsService, songsService, validator) {
     this._playlistsService = playlistsService;
     this._songsService = songsService;
@@ -9,10 +7,10 @@ class PlaylistsHandler{
 
   async postPlaylistHandler(request, h) {
     this._validator.validatePlaylistPayload(request.payload);
-    
+
     const { name } = request.payload;
     const { id: credentialId } = request.auth.credentials;
-    
+
     const playlistId = await this._playlistsService.addPlaylist({ name, owner: credentialId });
 
     const response = h.response({
@@ -20,17 +18,17 @@ class PlaylistsHandler{
       message: "Playlist berhasil ditambahkan",
       data: {
         playlistId,
-      }
+      },
     });
     response.code(201);
     return response;
   }
 
-  async getPlaylistsHandler(request, h) {
+  async getPlaylistsHandler(request) {
     const { id: credentialId } = request.auth.credentials;
 
     const playlists = await this._playlistsService.getPlaylists(credentialId);
-    
+
     return {
       status: "success",
       data: {
@@ -39,7 +37,7 @@ class PlaylistsHandler{
     };
   }
 
-  async deletePlaylistByIdHandler(request, h) {
+  async deletePlaylistByIdHandler(request) {
     const { id } = request.params;
 
     const { id: credentialId } = request.auth.credentials;
@@ -48,7 +46,7 @@ class PlaylistsHandler{
 
     await this._playlistsService.deletePlaylistById(id);
 
-    return{
+    return {
       status: "success",
       message: "Berhasil menghapus playlist",
     };
@@ -59,8 +57,7 @@ class PlaylistsHandler{
     const { id: playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
     const { songId } = request.payload;
-    
-    
+
     await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
 
     await this._songsService.getSongById(songId);
@@ -78,11 +75,11 @@ class PlaylistsHandler{
       status: "success",
       message: "Berhasil menambahkan music ke playlist",
     });
-    response.code(201)
+    response.code(201);
     return response;
   }
 
-  async getPlaylistSongsByOwnerHandler(request, h) {
+  async getPlaylistSongsByOwnerHandler(request) {
     const { id: playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
 
@@ -98,7 +95,7 @@ class PlaylistsHandler{
     };
   }
 
-  async deletePlaylistSongById(request, h) {
+  async deletePlaylistSongById(request) {
     this._validator.validatePlaylistSongsPayload(request.payload);
 
     const { id: playlistId } = request.params;
@@ -123,7 +120,7 @@ class PlaylistsHandler{
     };
   }
 
-  async getPlaylistSongsActivitiesHandler(request, h) {
+  async getPlaylistSongsActivitiesHandler(request) {
     const { id: credentialId } = request.auth.credentials;
     const { id: playlistId } = request.params;
 

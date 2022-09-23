@@ -24,7 +24,7 @@ exports.up = (pgm) => {
       type: "TIMESTAMP",
       notNull: true,
     },
-  })
+  });
 };
 
 exports.down = (pgm) => {

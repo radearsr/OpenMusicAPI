@@ -4,13 +4,13 @@ const InvariantError = require("../exceptions/InvariantError");
 const NotFoundError = require("../exceptions/NotFoundError");
 const AuthorizationError = require("../exceptions/AuthorizationError");
 
-class PlaylistsService{
+class PlaylistsService {
   constructor(collaborationsService) {
     this._pool = new Pool;
     this._collaborationsService = collaborationsService;
   }
 
-  async addPlaylist({name, owner}) {
+  async addPlaylist({ name, owner }) {
     const id = `playlist-${nanoid(16)}`;
 
     const query = {
@@ -37,7 +37,7 @@ class PlaylistsService{
 
     const result = await this._pool.query(query);
 
-    const {rows: playlists} = result;
+    const { rows: playlists } = result;
 
     return playlists;
   }
@@ -74,11 +74,11 @@ class PlaylistsService{
     }
   }
 
-  async addPlaylistSong(playlist_id, song_id) {
+  async addPlaylistSong(playlistId, songId) {
     const id = `playlist-song-${nanoid(16)}`;
     const query = {
       text: "INSERT INTO playlistsongs VALUES($1, $2, $3) RETURNING id",
-      values: [id, playlist_id, song_id],
+      values: [id, playlistId, songId],
     };
 
     const result = await this._pool.query(query);
@@ -98,7 +98,7 @@ class PlaylistsService{
       values: [playlistId, owner],
     };
     const resultDetailPlaylist = await this._pool.query(queryPlaylist);
-    const [ detailplaylists ] = resultDetailPlaylist.rows;
+    const [detailplaylists] = resultDetailPlaylist.rows;
 
     const querySongs = {
       text: "SELECT so.id, so.title, so.performer FROM songs AS so LEFT JOIN playlistsongs AS pls ON so.id = pls.song_id WHERE pls.playlist_id = $1 ORDER BY so.id;",
@@ -107,14 +107,14 @@ class PlaylistsService{
 
     const { rows } = await this._pool.query(querySongs);
 
-    const resultPlaylistSongs = Object.assign({}, detailplaylists, {songs: rows});
+    const resultPlaylistSongs = Object.assign(detailplaylists, { songs: rows });
 
     return resultPlaylistSongs;
   }
 
   async deletePlaylistSongById(playlistId, songId) {
-    const query =  {
-      text:"DELETE FROM playlistsongs WHERE playlist_id = $1 AND song_id = $2 RETURNING id",
+    const query = {
+      text: "DELETE FROM playlistsongs WHERE playlist_id = $1 AND song_id = $2 RETURNING id",
       values: [playlistId, songId],
     };
 
@@ -168,7 +168,7 @@ class PlaylistsService{
     const { rows: activities } = result;
 
     if (!activities.length) {
-      throw new NotFoundError("Belum ada aktifitas pada playlist musik ini")
+      throw new NotFoundError("Belum ada aktifitas pada playlist musik ini");
     }
 
     return activities;

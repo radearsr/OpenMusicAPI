@@ -1,5 +1,3 @@
-const ClientError = require("../../exceptions/ClientError");
-
 class AlbumHandler {
   constructor(service, validator) {
     this._service = service;
@@ -11,33 +9,32 @@ class AlbumHandler {
 
     const { name, year } = request.payload;
 
-    const albumId = await this._service.addAlbum({name, year});
-    
+    const albumId = await this._service.addAlbum({ name, year });
     const response = h.response({
       status: "success",
       data: {
-        albumId
-      }
+        albumId,
+      },
     });
     response.code(201);
     return response;
   }
 
-  async getAlbumByIdHandler(request, h) {
+  async getAlbumByIdHandler(request) {
     const { id } = request.params;
     const album = await this._service.getAlbumById(id);
-    
+
     return ({
       status: "success",
       data: {
         album,
-      }
+      },
     });
   }
 
-  async putAlbumByIdHandler(request, h) {
+  async putAlbumByIdHandler(request) {
     this._validator.validateAlbumPayload(request.payload);
-    
+
     const { id } = request.params;
     await this._service.editAlbumById(id, request.payload);
 
@@ -47,15 +44,15 @@ class AlbumHandler {
     };
   }
 
-  async deleteByIdHandler(request, h) {
+  async deleteByIdHandler(request) {
     const { id } = request.params;
 
     await this._service.deleteAlbumById(id);
 
     return {
       status: "success",
-      message: "Album berhasil dihapus."
-    }
+      message: "Album berhasil dihapus.",
+    };
   }
 }
 

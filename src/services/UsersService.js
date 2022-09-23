@@ -11,7 +11,6 @@ class UsersService {
   }
 
   async addUser({ username, password, fullname }) {
-
     await this.verifyNewUsername(username);
 
     const id = `user-${nanoid(16)}`;
@@ -20,15 +19,15 @@ class UsersService {
     const query = {
       text: "INSERT INTO users VALUES($1, $2, $3, $4) RETURNING id",
       values: [id, username, hashedPassword, fullname],
-    }
+    };
 
-    const result =  await this._pool.query(query);
+    const result = await this._pool.query(query);
 
     if (!result.rows.length) {
       throw new InvariantError("User gagal ditambahkan");
     }
 
-    const [{ id: userId }] = result.rows; 
+    const [{ id: userId }] = result.rows;
 
     return userId;
   }
@@ -44,7 +43,7 @@ class UsersService {
     if (result.rows.length > 0) {
       throw new InvariantError("Gagal menambahkan user. Username sudah digunakan");
     }
-  } 
+  }
 
   async verifyUserCredential(username, password) {
     const query = {
@@ -54,8 +53,8 @@ class UsersService {
 
     const result = await this._pool.query(query);
 
-    if(!result.rows.length) {
-      throw new AuthenticationsError("Username tidak tersedia")
+    if (!result.rows.length) {
+      throw new AuthenticationsError("Username tidak tersedia");
     }
 
     const [{ id, password: hashedPassword }] = result.rows;
@@ -73,7 +72,7 @@ class UsersService {
     const query = {
       text: "SELECT * FROM users WHERE id = $1",
       values: [id],
-    }
+    };
 
     const result = await this._pool.query(query);
 

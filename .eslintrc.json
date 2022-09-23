@@ -12,8 +12,12 @@
         "ecmaVersion": "latest"
     },
     "rules": {
-        "linebreak-style": ["warn", "windows"],
+        "linebreak-style": ["off", "windows"],
         "quotes": ["error", "double"],
-        "no-underscore-dangle": ["error", "allowAfterThis"]
+        "no-underscore-dangle": ["error", {"allowAfterThis": true}],
+        "no-console": ["off"],
+        "new-parens": ["off"],
+        "camelcase": ["off"],
+        "newline-per-chained-call": ["off"]
     }
 }

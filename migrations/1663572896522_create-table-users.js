@@ -1,5 +1,5 @@
-exports.up = pgm => {
-  pgm.createTable("users",{
+exports.up = (pgm) => {
+  pgm.createTable("users", {
     id: {
       type: "VARCHAR(50)",
       primaryKey: true,
@@ -16,10 +16,10 @@ exports.up = pgm => {
     fullname: {
       type: "TEXT",
       notNull: true,
-    }
-  })
+    },
+  });
 };
 
-exports.down = pgm => {
+exports.down = (pgm) => {
   pgm.dropTable("users");
 };

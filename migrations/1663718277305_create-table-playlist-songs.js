@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-exports.up = pgm => {
+exports.up = (pgm) => {
   pgm.createTable("playlistsongs", {
     id: {
       type: "VARCHAR(50)",
@@ -12,7 +12,7 @@ exports.up = pgm => {
     song_id: {
       type: "VARCHAR(50)",
       notNull: true,
-    }
+    },
   });
 
   pgm.addConstraint("playlistsongs", "unique_playlist_id_and_song_id", "UNIQUE(playlist_id, song_id)");
@@ -21,6 +21,6 @@ exports.up = pgm => {
   pgm.addConstraint("playlistsongs", "fk_playlist_songs.song_id_songs.id", "FOREIGN KEY(song_id) REFERENCES songs(id) ON DELETE CASCADE");
 };
 
-exports.down = pgm => {
+exports.down = (pgm) => {
   pgm.dropTable("playlistsongs");
 };

@@ -77,7 +77,7 @@ class PlaylistsService{
   async addPlaylistSong(playlist_id, song_id) {
     const id = `playlist-song-${nanoid(16)}`;
     const query = {
-      text: "INSERT INTO playlist_songs VALUES($1, $2, $3) RETURNING id",
+      text: "INSERT INTO playlistsongs VALUES($1, $2, $3) RETURNING id",
       values: [id, playlist_id, song_id],
     };
 
@@ -94,14 +94,14 @@ class PlaylistsService{
 
   async getPlaylistSongs(playlistId, owner) {
     const queryPlaylist = {
-      text: "SELECT dtplaylist.id, dtplaylist.name, dtplaylist.username FROM (SELECT pl.id, pl.name, usr.username FROM playlists AS pl LEFT JOIN collaborations AS clb ON pl.id = clb.playlist_id LEFT JOIN users AS usr ON pl.owner = usr.id WHERE (clb.playlist_id = $1 AND clb.user_id = $2) OR (pl.id = $1 AND pl.owner = $2)) AS dtplaylist",
+      text: "SELECT pl.id, pl.name, usr.username FROM playlists AS pl LEFT JOIN collaborations AS clb ON pl.id = clb.playlist_id LEFT JOIN users AS usr ON pl.owner = usr.id WHERE (clb.playlist_id = $1 AND clb.user_id = $2) OR (pl.id = $1 AND pl.owner = $2)",
       values: [playlistId, owner],
     };
     const resultDetailPlaylist = await this._pool.query(queryPlaylist);
     const [ detailplaylists ] = resultDetailPlaylist.rows;
 
     const querySongs = {
-      text: "SELECT so.id, so.title, so.performer FROM songs AS so LEFT JOIN playlist_songs AS pls ON so.id = pls.song_id WHERE pls.playlist_id = $1 ORDER BY so.id;",
+      text: "SELECT so.id, so.title, so.performer FROM songs AS so LEFT JOIN playlistsongs AS pls ON so.id = pls.song_id WHERE pls.playlist_id = $1 ORDER BY so.id;",
       values: [playlistId],
     };
 
@@ -114,7 +114,7 @@ class PlaylistsService{
 
   async deletePlaylistSongById(playlistId, songId) {
     const query =  {
-      text:"DELETE FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2 RETURNING id",
+      text:"DELETE FROM playlistsongs WHERE playlist_id = $1 AND song_id = $2 RETURNING id",
       values: [playlistId, songId],
     };
 
@@ -146,7 +146,7 @@ class PlaylistsService{
     const timeActivities = new Date().toISOString();
     new Date().toISOString();
     const query = {
-      text: "INSERT INTO playlist_songs_activities VALUES($1, $2, $3, $4, $5, $6) RETURNING id",
+      text: "INSERT INTO playlist_song_activities VALUES($1, $2, $3, $4, $5, $6) RETURNING id",
       values: [id, playlistId, userId, songId, action, timeActivities],
     };
 
@@ -160,7 +160,7 @@ class PlaylistsService{
 
   async getPlaylistSongsActivities(playlistId) {
     const query = {
-      text: "SELECT usr.username, so.title, plsa.action, plsa.time FROM playlist_songs_activities AS plsa LEFT JOIN users AS usr ON plsa.user_id = usr.id LEFT JOIN songs AS so ON plsa.song_id = so.id WHERE plsa.playlist_id = $1",
+      text: "SELECT usr.username, so.title, plsa.action, plsa.time FROM playlist_song_activities AS plsa LEFT JOIN users AS usr ON plsa.user_id = usr.id LEFT JOIN songs AS so ON plsa.song_id = so.id WHERE plsa.playlist_id = $1",
       values: [playlistId],
     };
 
@@ -168,9 +168,9 @@ class PlaylistsService{
     const { rows: activities } = result;
 
     if (!activities.length) {
-      throw new NotFoundError("Belum ada aktifitas pada playlist musik ini");
+      throw new NotFoundError("Belum ada aktifitas pada playlist musik ini")
     }
-    
+
     return activities;
   }
 }

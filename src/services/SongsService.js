@@ -61,7 +61,7 @@ class SongsService {
 
     const [resultRow] = result.rows.map(mapDBToModel);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError("Musik tidak ditemukan");
     }
     return resultRow;
@@ -84,7 +84,7 @@ class SongsService {
 
     const [resultRow] = result.rows;
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError("Gagal memperbarui musik. Id tidak ditemukan");
     }
 
@@ -99,7 +99,7 @@ class SongsService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError("Gagal menghapus musik. Id tidak ditemukan");
     }
   }

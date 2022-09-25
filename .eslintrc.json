@@ -14,7 +14,7 @@
     "rules": {
         "linebreak-style": ["off", "windows"],
         "quotes": ["error", "double"],
-        "no-underscore-dangle": ["error", {"allowAfterThis": true}],
+        "no-underscore-dangle": ["error", {"allow": true}],
         "no-console": ["off"],
         "new-parens": ["off"],
         "camelcase": ["off"],

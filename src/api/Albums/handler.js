@@ -1,4 +1,4 @@
-require("dotenv").config();
+const config = require("../../utils/config");
 
 class AlbumHandler {
   constructor(albumsService, storageService, validator) {
@@ -63,7 +63,7 @@ class AlbumHandler {
 
     const filename = await this._storageService.writeFile(cover, cover.hapi);
 
-    await this._albumsService.addAlbumCover(albumId, `http://${process.env.HOST}:${process.env.PORT}/album/cover/${filename}`);
+    await this._albumsService.addAlbumCover(albumId, `http://${config.app.host}:${config.app.port}/album/cover/${filename}`);
 
     const response = h.response({
       status: "success",

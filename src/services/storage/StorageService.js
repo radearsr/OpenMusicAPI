@@ -6,7 +6,6 @@ class StorageService {
 
     if (!fs.existsSync(folder)) {
       fs.mkdirSync(folder, { recursive: true });
-
     }
   }
 
@@ -20,7 +19,7 @@ class StorageService {
       fileStream.on("error", (error) => reject(error));
       file.pipe(fileStream);
       file.on("end", () => resolve(filename));
-    })
+    });
   }
 }
 

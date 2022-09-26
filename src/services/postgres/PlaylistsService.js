@@ -105,14 +105,14 @@ class PlaylistsService {
       };
       const resultDetailPlaylist = await this._pool.query(queryPlaylist);
       const [detailplaylists] = resultDetailPlaylist.rows;
-  
+
       const querySongs = {
         text: "SELECT so.id, so.title, so.performer FROM songs AS so LEFT JOIN playlistsongs AS pls ON so.id = pls.song_id WHERE pls.playlist_id = $1 ORDER BY so.id;",
         values: [playlistId],
       };
-  
+
       const { rows } = await this._pool.query(querySongs);
-  
+
       const resultPlaylistSongs = Object.assign(detailplaylists, { songs: rows });
       await this._cacheService.set(`playlistsong-${playlistId}`, JSON.stringify(resultPlaylistSongs));
 

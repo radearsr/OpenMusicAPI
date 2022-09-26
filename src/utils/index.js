@@ -10,6 +10,6 @@ const mapAlbumDetail = ({
 }) => ({
   ...args,
   coverUrl: cover,
-})
+});
 
 module.exports = { mapDBToModel, mapAlbumDetail };

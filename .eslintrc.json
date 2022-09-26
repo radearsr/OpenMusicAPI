@@ -14,10 +14,11 @@
     "rules": {
         "linebreak-style": ["off", "windows"],
         "quotes": ["error", "double"],
-        "no-underscore-dangle": ["error", {"allow": true}],
+        "no-underscore-dangle": ["off"],
         "no-console": ["off"],
         "new-parens": ["off"],
         "camelcase": ["off"],
-        "newline-per-chained-call": ["off"]
+        "newline-per-chained-call": ["off"],
+        "no-useless-catch": ["off"]
     }
 }

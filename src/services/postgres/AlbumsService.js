@@ -90,6 +90,61 @@ class AlbumsService {
       throw new InvariantError("Gagal menambahkan cover ke album");
     }
   }
+
+  async addLikeAlbum(albumId, userId) {
+    const id = `likes-${nanoid(16)}`
+    const query = {
+      text: "INSERT INTO user_album_likes VALUES($1, $2, $3) RETURNING id",
+      values: [id, userId, albumId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows[0].id) {
+      throw new InvariantError("Gagal menyukai album");
+    }
+
+    return "menambahkan suka";
+  }
+
+  async deleteLikeAlbum(albumId, userId) {
+    const query = {
+      text: "DELETE FROM user_album_likes WHERE user_id = $1 AND album_id = $2 RETURNING id",
+      values: [userId, albumId],
+    };
+   
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError("Gagal membatalkan suka. Id album tidak ditemukan.");
+    }
+
+    return "membatalkan suka";
+  }
+
+  async checkLikeAlbum(albumId, userId) {
+    try {
+      await this.deleteLikeAlbum(albumId, userId);
+    } catch {
+      try {
+        await this.addLikeAlbum(albumId, userId);
+      } catch(error) {
+        throw error
+      }
+    }
+  }
+
+  async getLikesCount(albumId) {
+    const query = {
+      text: "SELECT * FROM user_album_likes WHERE album_id = $1",
+      values: [albumId],
+    };
+    
+    const result = await this._pool.query(query);
+
+    return result.rowCount;
+  }
+
 }
 
 module.exports = AlbumsService;
